@@ -20,6 +20,8 @@
 
 	WaterStrider.prototype.update = function(timestamp) {
 		++this.step;
+		this.vx = 2*RANGE*Math.random()-RANGE;
+		this.vy = 2*RANGE*Math.random()-RANGE;
 		if (this.step > TIMERAG) {
 			this.step = 0;
 			for (var i = 0; i < water_striders.length; i++) {
