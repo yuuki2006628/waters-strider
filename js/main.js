@@ -71,11 +71,12 @@
 			draw(this.x,this.y,rapple,this.color,false);
 		}
 		if (is_enemy) {
-			if (destanceTo(this.x,this.y,mouse_posi.x,mouse_posi.y)<100) {
+			var d = destanceTo(this.x,this.y,mouse_posi.x,mouse_posi.y)
+			if (d < 100) {
 				this.step = 50;
 				var v = vector(this.x,this.y,mouse_posi.x,mouse_posi.y);
-				this.vx = -v.x;
-				this.vy = -v.y;
+				this.vx = -v.x/d * RANGE * Math.random();
+				this.vy = -v.y/d * RANGE * Math.random();
 				this.x += this.vx;
 				this.y += this.vy;
 			}
