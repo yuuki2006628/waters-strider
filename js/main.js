@@ -41,15 +41,19 @@
 
 	WaterStrider.prototype.update = function(timestamp) {
 		++this.step;
-		this.vx = 2*RANGE*Math.random()-RANGE;
-		this.vy = 2*RANGE*Math.random()-RANGE;
+		//this.vx = 2*RANGE*Math.random()-RANGE;
+		//this.vy = 2*RANGE*Math.random()-RANGE;
 		if (this.x > width- RANGE || this.y > height- RANGE) {
 			this.vx = Math.random()*RANGE*-1;
 			this.vy = Math.random()*RANGE*-1;
+			this.x += this.vx;
+			this.y += this.vy;
 		}
 		if (this.x < RANGE || this.y < RANGE) {
 			this.vx = Math.random()*RANGE;
 			this.vy = Math.random()*RANGE;
+			this.x += this.vx;
+			this.y += this.vy;
 		}
 		if (this.step > TIMERAG) {
 			this.step = Math.random()*TIMERAG;
@@ -81,6 +85,9 @@
 				this.y += this.vy;
 			}
 		}
+		draw_vector(this.x,this.y,
+					this.x+10*this.vx/Math.abs(this.vx),
+					this.y+10*this.vy/Math.abs(this.vy),this.color);
 		draw(this.x,this.y,this.size,this.color,true);
 	};
 
@@ -90,19 +97,27 @@
 		return Math.sqrt(dx*dx + dy*dy);
 	}
 
-
 	function vector(x1,y1,x2,y2){
 		return {
 			x:x2-x1,
 			y:y2-y1
 		};
 	}
+
 	function draw(x,y,size,color,isFill){
 		context.beginPath();
 		context.arc(x,y,size,0,Math.PI*2,false);
 		context.fillStyle = color;
 		context.strokeStyle = color;
 		isFill ? context.fill() : context.stroke();
+	}
+
+	function draw_vector(cx,cy,vx,vy,color){
+		context.beginPath();
+		context.moveTo(cx,cy);
+		context.lineTo(vx,vy);
+		context.strokeStyle = color;
+		context.stroke();
 	}
 
 	function get_random_color(){
