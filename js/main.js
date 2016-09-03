@@ -6,7 +6,28 @@
 		height = window.innerHeight,
 		canvas,
 		context,
-		water_striders = [];
+		water_striders = [],
+		is_enemy = false,
+		mouse_posi = {
+			x:0,
+			y:0
+		};
+
+	document.onmousedown = function(e){
+		is_enemy = true;
+		mouse_posi = {
+			x:e.clientX,
+			y:e.clientY
+		};
+	}
+	
+	document.onmouseup = function(e){
+		is_enemy = false;
+		mouse_posi = {
+			x:0,
+			y:0
+		};
+	}
 
 	function WaterStrider(x,y){
 		this.x = x;
@@ -22,8 +43,16 @@
 		++this.step;
 		this.vx = 2*RANGE*Math.random()-RANGE;
 		this.vy = 2*RANGE*Math.random()-RANGE;
+		if (this.x > width- RANGE || this.y > height- RANGE) {
+			this.vx = Math.random()*RANGE*-1;
+			this.vy = Math.random()*RANGE*-1;
+		}
+		if (this.x < RANGE || this.y < RANGE) {
+			this.vx = Math.random()*RANGE;
+			this.vy = Math.random()*RANGE;
+		}
 		if (this.step > TIMERAG) {
-			this.step = 0;
+			this.step = Math.random()*TIMERAG;
 			for (var i = 0; i < water_striders.length; i++) {
 				var obj = water_striders[i];
 				if (obj != this) {
@@ -35,19 +64,21 @@
 					}
 				}
 			}
-			if (this.x > width- RANGE || this.y > height- RANGE) {
-				this.vx = Math.random()*RANGE*-1;
-				this.vy = Math.random()*RANGE*-1;
-			}
-			if (this.x < RANGE || this.y < RANGE) {
-				this.vx = Math.random()*RANGE;
-				this.vy = Math.random()*RANGE;
-			}
 			this.x += this.vx;
 			this.y += this.vy;
 		}else{
 			var rapple = this.step / TIMERAG * RANGE;
 			draw(this.x,this.y,rapple,this.color,false);
+		}
+		if (is_enemy) {
+			if (destanceTo(this.x,this.y,mouse_posi.x,mouse_posi.y)<100) {
+				this.step = 50;
+				var v = vector(this.x,this.y,mouse_posi.x,mouse_posi.y);
+				this.vx = -v.x;
+				this.vy = -v.y;
+				this.x += this.vx;
+				this.y += this.vy;
+			}
 		}
 		draw(this.x,this.y,this.size,this.color,true);
 	};
@@ -74,7 +105,7 @@
 	}
 
 	function get_random_color(){
-		var h = Math.random()*360;
+		var h = Math.random()*100;
 		return 'hsl('+h+',100%,50%)';
 	}
 
