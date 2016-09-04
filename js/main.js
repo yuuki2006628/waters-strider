@@ -48,30 +48,18 @@
 		if (this.x > width- RANGE || this.y > height- RANGE) {
 			this.vx = Math.random()*RANGE*-1;
 			this.vy = Math.random()*RANGE*-1;
-			this.ex.push(this.x);
-			this.ey.push(this.y);
-			this.rapple.push(0);
-			this.x += this.vx;
-			this.y += this.vy;
+			this.move();
 		}
 		if (this.x < RANGE || this.y < RANGE) {
 			this.vx = Math.random()*RANGE;
 			this.vy = Math.random()*RANGE;
-			this.ex.push(this.x);
-			this.ey.push(this.y);
-			this.rapple.push(0);
-			this.x += this.vx;
-			this.y += this.vy;
+			this.move();
 		}
 		if (this.step > TIMERAG) {
 			this.vx = 2*RANGE*Math.random()-RANGE;
 			this.vy = 2*RANGE*Math.random()-RANGE;
 			this.step = 0;
-			this.ex.push(this.x);
-			this.ey.push(this.y);
-			this.rapple.push(0);
-			this.x += this.vx;
-			this.y += this.vy;
+			this.move();
 		}
 		if (is_enemy) {
 			var d = destanceTo(this.x,this.y,mouse_posi.x,mouse_posi.y)
@@ -80,18 +68,19 @@
 				var v = vector(this.x,this.y,mouse_posi.x,mouse_posi.y);
 				this.vx = -v.x/d * RANGE * Math.random();
 				this.vy = -v.y/d * RANGE * Math.random();
-				this.ex.push(this.x);
-				this.ey.push(this.y);
-				this.rapple.push(0);
-				this.x += this.vx;
-				this.y += this.vy;
+				this.move();
 			}
 		}
 		var rapple = this.step / TIMERAG * RANGE;
 		draw_rapple(this.x,this.y,rapple,this.color,1/rapple);
 		for (var i = 0; i < this.ex.length; i++) {
 			++this.rapple[i];
-			draw_rapple(this.ex[i],this.ey[i],this.rapple[i]/i,this.color,1/this.rapple[i]);
+			draw_rapple(this.ex[i],this.ey[i],this.rapple[i],this.color,1/this.rapple[i]);
+		}
+		if (this.rapple.length > 30) {
+			this.rapple.shift();
+			this.ex.shift();
+			this.ey.shift();
 		}
 		draw_vector(this.x,this.y,
 					this.x+this.vx,
@@ -108,14 +97,18 @@
 					var v = vector(this.x,this.y,obj.x,obj.y);
 					this.vx = v.x * -1;
 					this.vy = v.y * -1;
-					this.ex.push(this.x);
-					this.ey.push(this.y);
-					this.rapple.push(0);
-					this.x += this.vx;
-					this.y += this.vy;
+					this.move();
 				}
 			}
 		}
+	};
+
+	WaterStrider.prototype.move = function() {
+		this.ex.push(this.x);
+		this.ey.push(this.y);
+		this.rapple.push(this.step);
+		this.x += this.vx;
+		this.y += this.vy;
 	};
 
 	function destanceTo(x1,y1,x2,y2){
