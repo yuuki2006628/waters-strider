@@ -67,17 +67,6 @@
 			this.vx = 2*RANGE*Math.random()-RANGE;
 			this.vy = 2*RANGE*Math.random()-RANGE;
 			this.step = 0;
-			for (var i = 0; i < water_striders.length; i++) {
-				var obj = water_striders[i];
-				if (obj != this) {
-					var d = destanceTo(this.x,this.y,obj.x,obj.y);
-					if (d < RANGE) {
-						var v = vector(this.x,this.y,obj.x,obj.y);
-						this.vx = v.x * -1;
-						this.vy = v.y * -1;
-					}
-				}
-			}
 			this.ex.push(this.x);
 			this.ey.push(this.y);
 			this.rapple.push(0);
@@ -108,6 +97,25 @@
 					this.x+this.vx,
 					this.y+this.vy,this.color);
 		draw(this.x,this.y,this.size,this.color);
+	};
+
+	WaterStrider.prototype.bump = function() {
+		for (var i = 0; i < water_striders.length; i++) {
+			var obj = water_striders[i]
+			if (this != obj) {
+				var d = destanceTo(this.x,this.y,obj.x,obj.y);
+				if (d < RANGE) {
+					var v = vector(this.x,this.y,obj.x,obj.y);
+					this.vx = v.x * -1;
+					this.vy = v.y * -1;
+					this.ex.push(this.x);
+					this.ey.push(this.y);
+					this.rapple.push(0);
+					this.x += this.vx;
+					this.y += this.vy;
+				}
+			}
+		}
 	};
 
 	function destanceTo(x1,y1,x2,y2){
@@ -173,6 +181,7 @@
 		context.clearRect(0,0,width,height);
 		for (var i = 0; i < water_striders.length; i++) {
 			water_striders[i].update();
+			water_striders[i].bump();
 		}
 	}
 	init();
