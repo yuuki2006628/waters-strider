@@ -1,7 +1,8 @@
 (function(){
-	var RANGE = 60,
-		N = 10,
-		TIMERAG = 200;
+	var RANGE = 30,
+		N = 30,
+		TIMERAG = 200,
+		SIZE = 10;
 	var width = window.innerWidth,
 		height = window.innerHeight,
 		canvas,
@@ -34,45 +35,54 @@
 		this.y = y;
 		this.vx = 2*RANGE*Math.random()-RANGE;
 		this.vy = 2*RANGE*Math.random()-RANGE;
-		this.size = 5;
+		this.ex = [];
+		this.ey = [];
+		this.rapple = [];
+		this.size = SIZE;
 		this.step = Math.random()*TIMERAG;
 		this.color = get_random_color();
 	}
 
 	WaterStrider.prototype.update = function(timestamp) {
 		++this.step;
-		//this.vx = 2*RANGE*Math.random()-RANGE;
-		//this.vy = 2*RANGE*Math.random()-RANGE;
 		if (this.x > width- RANGE || this.y > height- RANGE) {
 			this.vx = Math.random()*RANGE*-1;
 			this.vy = Math.random()*RANGE*-1;
+			this.ex.push(this.x);
+			this.ey.push(this.y);
+			this.rapple.push(0);
 			this.x += this.vx;
 			this.y += this.vy;
 		}
 		if (this.x < RANGE || this.y < RANGE) {
 			this.vx = Math.random()*RANGE;
 			this.vy = Math.random()*RANGE;
+			this.ex.push(this.x);
+			this.ey.push(this.y);
+			this.rapple.push(0);
 			this.x += this.vx;
 			this.y += this.vy;
 		}
 		if (this.step > TIMERAG) {
-			this.step = Math.random()*TIMERAG;
+			this.vx = 2*RANGE*Math.random()-RANGE;
+			this.vy = 2*RANGE*Math.random()-RANGE;
+			this.step = 0;
 			for (var i = 0; i < water_striders.length; i++) {
 				var obj = water_striders[i];
 				if (obj != this) {
 					var d = destanceTo(this.x,this.y,obj.x,obj.y);
-					if (d < 5) {
+					if (d < RANGE) {
 						var v = vector(this.x,this.y,obj.x,obj.y);
 						this.vx = v.x * -1;
 						this.vy = v.y * -1;
 					}
 				}
 			}
+			this.ex.push(this.x);
+			this.ey.push(this.y);
+			this.rapple.push(0);
 			this.x += this.vx;
 			this.y += this.vy;
-		}else{
-			var rapple = this.step / TIMERAG * RANGE;
-			draw(this.x,this.y,rapple,this.color,false);
 		}
 		if (is_enemy) {
 			var d = destanceTo(this.x,this.y,mouse_posi.x,mouse_posi.y)
@@ -81,14 +91,23 @@
 				var v = vector(this.x,this.y,mouse_posi.x,mouse_posi.y);
 				this.vx = -v.x/d * RANGE * Math.random();
 				this.vy = -v.y/d * RANGE * Math.random();
+				this.ex.push(this.x);
+				this.ey.push(this.y);
+				this.rapple.push(0);
 				this.x += this.vx;
 				this.y += this.vy;
 			}
 		}
+		var rapple = this.step / TIMERAG * RANGE;
+		draw_rapple(this.x,this.y,rapple,this.color,1/rapple);
+		for (var i = 0; i < this.ex.length; i++) {
+			++this.rapple[i];
+			draw_rapple(this.ex[i],this.ey[i],this.rapple[i]/i,this.color,1/this.rapple[i]);
+		}
 		draw_vector(this.x,this.y,
 					this.x+10*this.vx/Math.abs(this.vx),
 					this.y+10*this.vy/Math.abs(this.vy),this.color);
-		draw(this.x,this.y,this.size,this.color,true);
+		draw(this.x,this.y,this.size,this.color);
 	};
 
 	function destanceTo(x1,y1,x2,y2){
@@ -104,14 +123,20 @@
 		};
 	}
 
-	function draw(x,y,size,color,isFill){
+	function draw(x,y,size,color){
 		context.beginPath();
 		context.arc(x,y,size,0,Math.PI*2,false);
 		context.fillStyle = color;
 		context.strokeStyle = color;
-		isFill ? context.fill() : context.stroke();
+		context.fill()
 	}
-
+	function draw_rapple(x,y,size,color,lw){
+		context.beginPath();
+		context.arc(x,y,size,0,Math.PI*2,false);
+		context.strokeStyle = color;
+		context.lineWidth = lw;
+		context.stroke();
+	}
 	function draw_vector(cx,cy,vx,vy,color){
 		context.beginPath();
 		context.moveTo(cx,cy);
