@@ -105,8 +105,8 @@
 			draw_rapple(this.ex[i],this.ey[i],this.rapple[i]/i,this.color,1/this.rapple[i]);
 		}
 		draw_vector(this.x,this.y,
-					this.x+10*this.vx/Math.abs(this.vx),
-					this.y+10*this.vy/Math.abs(this.vy),this.color);
+					this.x+this.vx,
+					this.y+this.vy,this.color);
 		draw(this.x,this.y,this.size,this.color);
 	};
 
@@ -141,6 +141,7 @@
 		context.beginPath();
 		context.moveTo(cx,cy);
 		context.lineTo(vx,vy);
+		context.lineWidth = 1;
 		context.strokeStyle = color;
 		context.stroke();
 	}
